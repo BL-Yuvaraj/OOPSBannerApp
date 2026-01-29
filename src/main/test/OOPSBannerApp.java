@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * OOPSBannerApp
  * <p>
@@ -92,38 +95,44 @@ public class OOPSBannerApp {
     }
 
     /**
-     * Retrieves pattern for a given character.
+     * Converts CharacterPatternMap array to Map for efficient lookup.
      *
-     * @param ch       character to look up
-     * @param charMaps character pattern mappings
-     * @return ASCII pattern
+     * @param charMaps array of character pattern mappings
+     * @return Map of character to pattern
      */
-    public static String[] getCharacterPattern(char ch, CharacterPatternMap[] charMaps) {
+    public static Map<Character, String[]> createCharacterPatternMap(CharacterPatternMap[] charMaps) {
+
+        Map<Character, String[]> patternMap = new HashMap<>();
+
         for (CharacterPatternMap map : charMaps) {
-            if (map.getCharacter() == ch) {
-                return map.getPattern();
-            }
+            patternMap.put(map.getCharacter(), map.getPattern());
         }
-        // fallback to space
-        return getCharacterPattern(' ', charMaps);
+
+        return patternMap;
     }
 
     /**
      * Prints the message as a banner.
      *
      * @param message  message to print
-     * @param charMaps available character patterns
+     * @param patternMap available character patterns
      */
-    public static void printMessage(String message, CharacterPatternMap[] charMaps) {
+    public static void printMessage(String message, Map<Character, String[]> patternMap) {
 
         for (int row = 0; row < 7; row++) {
             StringBuilder line = new StringBuilder();
 
             for (int i = 0; i < message.length(); i++) {
                 char ch = message.charAt(i);
-                line.append(getCharacterPattern(ch, charMaps)[row]);
 
-                // Add space ONLY between characters, not at end
+                String[] pattern = patternMap.getOrDefault(
+                        ch,
+                        patternMap.get(' ')
+                );
+
+                line.append(pattern[row]);
+
+                // Add space ONLY between characters
                 if (i < message.length() - 1) {
                     line.append(" ");
                 }
@@ -132,7 +141,6 @@ public class OOPSBannerApp {
             System.out.println(line.toString());
         }
     }
-
 
     /**
      * Main entry point.
@@ -144,9 +152,10 @@ public class OOPSBannerApp {
         System.out.println("Welcome to OOPS Banner Application");
 
         CharacterPatternMap[] charMaps = createCharacterPatternMaps();
+        Map<Character, String[]> patternMap = createCharacterPatternMap(charMaps);
+
         String message = "OOPS";
 
-        printMessage(message, charMaps);
+        printMessage(message, patternMap);
     }
-
 }
